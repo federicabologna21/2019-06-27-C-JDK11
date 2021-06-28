@@ -7,6 +7,7 @@ package it.polito.tdp.crimes;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.crimes.model.Adiacenza;
 import it.polito.tdp.crimes.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,10 +26,10 @@ public class CrimesController {
     private URL location;
 
     @FXML // fx:id="boxCategoria"
-    private ComboBox<?> boxCategoria; // Value injected by FXMLLoader
+    private ComboBox<String> boxCategoria; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxGiorno"
-    private ComboBox<?> boxGiorno; // Value injected by FXMLLoader
+    private ComboBox<Integer> boxGiorno; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnAnalisi"
     private Button btnAnalisi; // Value injected by FXMLLoader
@@ -45,7 +46,29 @@ public class CrimesController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Crea grafo...\n");
+    //	txtResult.appendText("Crea grafo...\n");
+    	
+    	String categoria = this.boxCategoria.getValue();
+    	if (categoria == null) {
+    		txtResult.appendText("Selezionare una categoria per effettuare l'analisi!\\n");
+    		return ;
+    	}
+    	
+    	Integer mese = this.boxGiorno.getValue();
+    	if (mese == null) {
+    		txtResult.appendText("Selezionare un giorno per effettuare l'analisi!\n");
+    		return ;
+    	}
+    	
+    	this.model.creaGrafo(categoria, mese);
+    	txtResult.appendText("GRAFO CREATO!\n");
+    	txtResult.appendText("# VERTICI: "+this.model.getNumVertici()+"\n");
+    	txtResult.appendText("# ARCHI: "+this.model.getNumArchi()+"\n");
+    	
+    	txtResult.appendText("ARCHI CON PESO INFERIORE AL PESO MEDIANO "+this.model.getPesoMediano()+"\n");
+    	for (Adiacenza a: this.model.getArchiPesoInfMediano()) {
+    		txtResult.appendText(a+"\n");
+    	}
     }
 
     @FXML
@@ -67,5 +90,8 @@ public class CrimesController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	this.boxCategoria.getItems().addAll(this.model.getCategorie());
+    	this.boxGiorno.getItems().addAll(this.model.getGiorno());
     }
 }
